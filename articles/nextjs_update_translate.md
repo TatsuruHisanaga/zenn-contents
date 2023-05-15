@@ -1,10 +1,10 @@
-# Next.js 13.4まとめ
-
-ステータス: アイデア
-作成者: 久永竜琉
-種別: 公式ドキュメント
-言語: Next.js
-published: false
+---
+title: "Next.js 13.4まとめ" # 記事のタイトル
+emoji: "😸" # アイキャッチとして使われる絵文字（1文字だけ）
+type: "tech" # tech: 技術記事 / idea: アイデア記事
+topics: ["nextjs"] # タグ。["markdown", "rust", "aws"]のように指定する
+published: false # 公開設定（falseにすると下書き）
+---
 
 [Next.js 13.4](https://nextjs.org/blog/next-13-4)
 
