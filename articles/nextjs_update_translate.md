@@ -6,50 +6,59 @@ topics: ["nextjs"] # タグ。["markdown", "rust", "aws"]のように指定す�
 published: false # 公開設定（falseにすると下書き）
 ---
 
-[Next.js 13.4](https://nextjs.org/blog/next-13-4)
 
-[Next.js Cacheのアツさをシェアしたい(App Router)](https://zenn.dev/sumiren/articles/664c86a28ec573)
+
+https://nextjs.org/blog/next-13-4
+
+https://zenn.dev/sumiren/articles/664c86a28ec573
+
+:::message alert
+この記事はNext.jsの公式ドキュメントをChatGPT-4で翻訳・校正したものであり、リンクの適用以外に筆者は記事に変更を加えていません。万全を期してはいますが、日本語と英語のニュアンスの違いによる誤解を誘発する可能性や、公式ドキュメントとの相違がみられる可能性が否定できません。予めご了承ください。
+:::
+
+---
 
 # **Next.js 13.4**
 
-Friday, May 5th 2023
+2023年5月5日（金）
 
-Next.js 13.4は基盤となるリリースであり、App Routerの安定性を確認します:
+Next.js 13.4は基盤となるリリースであり、App Routerの安定性が確認されます：
 
-- App Router (安定版):
+- App Router (安定版)：
     - React Server Components
-    - ネストされたルートとレイアウト
+    - ネスト可能なルートとレイアウト
     - データ取得の簡素化
     - ストリーミングとサスペンス
-    - 組み込みSEOサポート
-- Turbopack (ベータ版): ローカル開発サーバーがより高速かつ安定性が向上
-- Server Actions (アルファ版): クライアントのJavaScriptをゼロにしてサーバー上でデータを変更
+    - 組み込みのSEOサポート
+- Turbopack (ベータ版)：ローカル開発サーバーの速度と安定性が向上
+- Server Actions (アルファ版)：クライアントのJavaScriptの必要性をゼロにし、サーバー上でデータを操作
 
-Next.js 13のリリースから6ヶ月間、我々は必要以上の破壊的変更を避けつつ、段階的に採用可能な方法でNext.jsの未来の基盤を構築することに焦点を当ててきました。
+Next.js 13のリリースから6ヶ月間、我々は破壊的変更を最小限に抑えつつ、段階的に採用可能な形でNext.jsの未来の基盤を構築することに焦点を当ててきました。
 
-今日、13.4のリリースにより、プロダクションでApp Routerを採用することが可能となりました。
+今日、13.4のリリースにより、プロダクション環境でApp Routerの導入が可能となりました。
 
 ```
 npm i next@latest react@latest react-dom@latest eslint-config-next@latest
 ```
 
-Next.js App Router
-私たちは2016年にNext.jsをリリースし、よりダイナミックでパーソナライズされたグローバルなウェブを作成する目的で、Reactアプリケーションをサーバーレンダリングする簡単な方法を提供しました。
+## Next.js App Router
+我々は2016年にNext.jsをリリースし、Reactアプリケーションをサーバーレンダリングする簡単な方法を提供し、よりダイナミックでパーソナライズされたグローバルウェブの構築を目指しました。
 
-[最初の発表投稿](https://vercel.com/blog/next)では、Next.jsの設計原則をいくつか共有しました:
+[最初の発表投稿](https://vercel.com/blog/next)では、Next.jsの設計原則をいくつか共有しました：
 
-- セットアップゼロ。ファイルシステムをAPIとして使用
-- JavaScriptのみ。全てが関数
+- ゼロ設定：ファイルシステムをAPIとして利用
+- JavaScriptのみ：全てが関数
 - 自動的なサーバーレンダリングとコード分割
 - データの取得は開発者次第
 
-Next.jsは今や6年目です。当初の設計原則はそのまま残っており、Next.jsがより多くの開発者や企業に採用されるにつれて、これらの原則をより良く実現するためのフレームワークの基盤的なアップグレードに取り組んできました。
+Next.jsは現在6年目を迎えています。当初の設計原則はそのままに、Next.jsがより多くの開発者や企業に採用されるにつれて、これらの原則をより良く実現するためのフレームワークの基盤的なアップグレードに取り組んできました。
 
-私たちはNext.jsの次世代版に取り組んでおり、今日の`13.4`により、この次世代版は安定して採用可能となりました。この投稿では、App Routerのための設計決定と選択について詳しく説明します。
+我々はNext.jsの次世代版に取り組んでおり、今日の`13.4`のリリースにより、この次世代版は安定して採用可能となりました。この記事では、App Routerの設計決定と選択について詳しく説明します。
 
-## ゼロセットアップ、ファイルシステムをAPIとして使用
 
-[ファイルシステムベースのルーティング](https://nextjs.org/docs/app/building-your-application/routing)はNext.jsのコア機能でした。当初の投稿では、1つのReactコンポーネントからルートを作成するこの例を示しました:
+## ゼロ設定、ファイルシステムをAPIとして利用
+
+[ファイルシステムベースのルーティング](https://nextjs.org/docs/app/building-your-application/routing)はNext.jsのコア機能でした。初期の投稿では、1つのReactコンポーネントからルートを作成するこの例を示しました：
 
 ```jsx:pages/about.js
 // ページルーター
@@ -60,15 +69,18 @@ export default () => <h1>私たちについて</h1>;
 
 ```
 
-追加で設定する必要は何もありませんでした。ファイルをpages/内にドロップすれば、Next.jsのルーターが残りの部分を処理します。私たちは依然としてこのルーティングのシンプルさを愛しています。しかし、フレームワークの使用が増えるにつれて、開発者がそれを使って構築したいインターフェースの種類も増えました。
+追加の設定は一切不要でした。ファイルをpages/ディレクトリに追加すれば、Next.jsのルーターが残りの部分を処理します。私たちは依然としてこのルーティングのシンプルさを愛しています。しかし、フレームワークの使用が増えるにつれて、開発者がそれを使って構築したいインターフェースの種類も増えてきました。
 
-開発者たちはレイアウトの定義、UIのレイアウトとしてのネスティング、ローディングとエラー状態の定義についてより多くの柔軟性を持つための改善されたサポートを求めていました。これは既存のNext.jsルーターに後付けするのは容易なことではありませんでした。
+<!-- 🐵第一部ここまで -->
 
-フレームワークのすべての部分はルーターを中心に設計されている必要があります。ページ遷移、データフェッチング、キャッシュ、データの変更と再検証、ストリーミング、コンテンツのスタイリングなどです。
 
-私たちは、ルーターをストリーミングと互換性があるようにし、レイアウトの強化されたサポートのためのこれらの要望を解決するために、ルーターの新しいバージョンを構築することにしました。
+開発者たちは、レイアウトの定義、UIレイアウトのネスティング、ローディングとエラー状態の定義について、より柔軟なサポートを求めていました。これらの改善を既存のNext.jsルーターに後付けするのは容易なことではありませんでした。
 
-これは、私たちが[レイアウトのRFC](https://nextjs.org/blog/layouts-rfc)の最初のリリース後に着地した場所です。
+フレームワークの各部分はルーターを中心に設計されるべきです。ページ遷移、データフェッチング、キャッシュ、データの変更と再検証、ストリーミング、コンテンツのスタイリングなどがそれに当たります。
+
+ルーターをストリーミングに対応させ、レイアウトの強化されたサポートを提供するために、私たちは新しいバージョンのルーターの構築を決定しました。
+
+これは私たちが[レイアウトのRFC](https://nextjs.org/blog/layouts-rfc)の初版リリース後に到達した結論です。
 
 ```jsx:app/layout.js
 // 新: App Router ✨
@@ -88,23 +100,24 @@ export default function Page() {
 
 ```
 
-ここで重要なのは、あなたが見ることができるものよりも、見ることができないものです。この新しいルーター（`app/`ディレクトリを通じて徐々に採用することができます）は、全く異なるアーキテクチャを持っており、[React Server Components](https://nextjs.org/docs/getting-started/react-essentials)と[Suspense](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming)の基盤の上に構築されています。
+ここで重要なのは、見ることができるものよりも、見ることができないものです。この新しいルーター（`app/`ディレクトリを通じて段階的に採用可能です）は、全く新しいアーキテクチャを持っており、[React Server Components](https://nextjs.org/docs/getting-started/react-essentials)と[Suspense](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming)の基盤上に構築されています。
 
-この基盤により、我々は初めてReactのプリミティブを拡張するために開発されたNext.js特有のAPIを削除することができました。例えば、グローバル共有レイアウトをカスタマイズするためにカスタム`_app`ファイルを使用する必要はもうありません：
+この新しい基盤により、我々は初めてReactのプリミティブを拡張するために開発されたNext.js特有のAPIを削除できました。例えば、全体的な共有レイアウトをカスタマイズするためにカスタム`_app`ファイルを使用する必要はもうありません：
 
 ```jsx:pages/_app.js
 // ページルーター
 // pages/_app.js
 
-// この"global layout"は全てのルートをラップします。他のレイアウトコンポーネントを
+// この"global layout"は全てのルートをラップします。他のレイアウトコンポーネントと
 // 組み合わせる方法はありませんし、このファイルからグローバルなデータをフェッチすることはできません。
 export default function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />;
 }
-
 ```
+<!-- 第二部ここまで -->
 
-ページルーターでは、レイアウトを組み合わせることができず、データフェッチングをコンポーネントと同じ場所に配置することができませんでした。新しいApp Routerでは、これがサポートされています。
+
+ページルーターでは、レイアウトの組み合わせやコンポーネントと一緒にデータフェッチングを配置することができませんでした。新しいApp Routerでは、これが可能になっています。
 
 ```jsx:app/layout.js
 // 新: App Router ✨
@@ -117,6 +130,7 @@ export default function RootLayout({ children }) {
       <body>{children}</body>
     </html>
   );
+}
 
 // app/dashboard/layout.js
 //
@@ -129,7 +143,6 @@ export default function DashboardLayout({ children }) {
     </section>
   );
 }
-
 ```
 
 ページルーターでは、`_document`を使用してサーバーからの初期ペイロードをカスタマイズしていました。
@@ -139,7 +152,7 @@ export default function DashboardLayout({ children }) {
 // pages/_document.js
 
 // このファイルを使用すると、サーバーリクエストの<html>と<body>タグをカスタマイズできますが、
-// HTML要素を書くのではなく、フレームワーク固有の機能が追加されます。
+// ただし、フレームワーク固有の機能が追加されます。
 import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
@@ -153,10 +166,9 @@ export default function Document() {
     </Html>
   );
 }
-
 ```
 
-App Routerでは、Next.jsから`<Html>`、`<Head>`、`<Body>`をインポートする必要はもうありません。代わりに、Reactを使用します。
+しかし、App Routerでは、Next.jsから`<Html>`、`<Head>`、`<Body>`をインポートする必要はもうありません。代わりに、直接Reactを使用します。
 
 ```jsx:app/layout.js
 // 新: App Router ✨
@@ -170,14 +182,15 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-
 ```
 
-新しいファイルシステムルーターを構築する機会は、ルーティングシステムに関連する他の多くの機能要求に対応するための適切なタイミングでもありました。例えば：
+<!-- 第3部ここまで -->
 
--以前は、グローバルスタイルシートを`_external npm packages`（コンポーネントライブラリなど）から`_app.js`にインポートすることしかできませんでした。これは、開発者体験としては理想的ではありませんでした。App Routerでは、任意のCSSファイルを任意のコンポーネントにインポート（および配置）することができます。
--以前は、Next.jsでサーバーサイドレンダリングを選択する（`getServerSideProps`を通じて）と、全ページがハイドレートされるまでアプリケーションとの対話がブロックされてしまいました。App Routerでは、React Suspenseと深く統合されたアーキテクチャにリファクタリングしています。これにより、ページの一部を選択的にハイドレートすることができ、UIの他のコンポーネントがインタラクティブであることをブロックすることなく、コンテンツをサーバーから即座にストリームできます。これにより、ページの読み込み性能を向上させることができます。
-[ルーター](https://nextjs.org/docs/app/building-your-application/routing)は、Next.jsを機能させるための核となるものです。しかし、ルーターそのものが重要なのではなく、ルーターがフレームワークの残りの部分、たとえば[データフェッチ](https://nextjs.org/docs/app/building-your-application/data-fetching)をどのように統合しているかが重要です。
+新しいファイルシステムルーターの構築は、ルーティングシステムに関連する他の多くの機能要求に対応する絶好の機会でもありました。例えば：
+
+- 以前は、`_app.js`にグローバルスタイルシートをインポートする際に、`_external npm packages`（コンポーネントライブラリなど）からのみ可能でした。これは、開発者体験としては理想的ではありませんでした。App Routerでは、任意のCSSファイルを任意のコンポーネントにインポート（および配置）することができます。
+- 以前は、Next.jsでサーバーサイドレンダリングを選択する（`getServerSideProps`を通じて）と、全ページがハイドレートされるまでアプリケーションとの対話がブロックされてしまいました。しかし、App Routerでは、React Suspenseと深く統合されたアーキテクチャへとリファクタリングしました。これにより、ページの一部を選択的にハイドレートし、UIの他のコンポーネントがインタラクティブであることをブロックすることなく、コンテンツをサーバーから即座にストリームできます。これにより、ページの読み込み性能を向上させることができます。
+[ルーター](https://nextjs.org/docs/app/building-your-application/routing)は、Next.jsの機能を実現するための核心です。しかし、ルーターそのものの重要性よりも、ルーターがフレームワークの残りの部分、たとえば[データフェッチ](https://nextjs.org/docs/app/building-your-application/data-fetching)といった要素をどのように統合しているかが重要です。
 
 ## "JavaScriptだけ。全てが関数"
 
@@ -198,9 +211,10 @@ export default () => (
 
 ```
 
-このコンポーネントは、アプリケーション内のどこでも再利用して組み合わせることができるロジックをカプセル化します。ファイルシステムルーティングと組み合わせると、JavaScriptとHTMLを書く感覚でReactアプリケーションを作り始める簡単な方法が得られました。
+このコンポーネントは、アプリケーション内のどこでも再利用し、組み合わせることができるロジックをカプセル化します。ファイルシステムルーティングと組み合わせると、JavaScriptとHTMLを書く感覚でReactアプリケーションを作り始める簡単な方法が得られました。
+<!-- 第4部ここまで -->
 
-たとえば、データをフェッチしたい場合、Next.jsの最初のバージョンは次のようになります：
+例えば、データをフェッチしたい場合、Next.jsの最初のバージョンは次のようになります：
 
 ```jsx
 import React from 'react';
@@ -208,21 +222,20 @@ import 'isomorphic-fetch';
 
 export default class extends React.Component {
   static async getInitialProps() {
-    const res = await fetch('<https://api.company.com/user/123>');
+    const res = await fetch('https://api.company.com/user/123');
     const data = await res.json();
     return { username: data.profile.username };
   }
 }
-
 ```
 
 ~~Next.jsの将来のバージョンでは、isomorphic-fetchやnode-fetchをインポートする必要がなく、クライアントとサーバーの両方でWeb fetch APIを使用できるように、fetchをポリフィルするDX改善を追加しました。~~
 
-採用が拡大し、フレームワークが成熟するにつれて、データフェッチングの新しいパターンを探求しました。
+フレームワークが成熟し、採用が拡大するにつれて、新しいデータフェッチングのパターンを探求しました。
 
-`getInitialProps`はサーバーとクライアントの両方で実行されました。このAPIはReactコンポーネントを拡張し、`Promise`を作成して結果をコンポーネントのpropsに転送することを可能にしました。
+`getInitialProps`はサーバーとクライアントの両方で実行されました。このAPIはReactコンポーネントを拡張し、結果をコンポーネントのpropsに転送するPromiseを作成することを可能にしました。
 
-`getInitialProps`は今でも動作しますが、その後、顧客のフィードバックに基づいて次世代のデータフェッチングAPI、`getServerSideProps`と`getStaticProps`に向けて進化しました。
+`getInitialProps`は今でも動作しますが、その後、顧客のフィードバックに基づいて次世代のデータフェッチングAPI、`getServerSideProps`と`getStaticProps`へと進化しました。
 
 ```jsx
 // ルートの静的バージョンを生成する
@@ -233,8 +246,8 @@ export async function getStaticProps(context) {
 export async function getServerSideProps(context) {
   return { props: {} };
 }
-
 ```
+<!-- 第５部ここまで -->
 
 これらのAPIは、コードがクライアント側かサーバー側のどちらで実行されているかをより明確にし、Next.jsアプリケーションを[自動的に静的に最適化](https://nextjs.org/docs/pages/building-your-application/rendering/automatic-static-optimization)することを可能にしました。さらに、[静的エクスポート](https://nextjs.org/docs/app/building-your-application/deploying/static-exports)を可能にし、サーバーをサポートしていない場所（例：AWS S3バケット）にNext.jsをデプロイすることができました。
 
@@ -244,21 +257,21 @@ Next.jsが作成されて以来、私たちはMetaのReactコアチームと緊�
 
 App Routerでは、おなじみのasyncとawaitの構文を使用して[データをフェッチ](https://nextjs.org/docs/app/building-your-application/data-fetching)します。新たに学ぶべきAPIはありません。デフォルトでは、すべてのコンポーネントはReact Server Componentsであるため、データフェッチングはサーバー上で安全に行われます。例えば：
 
-```jsx:app/page.js
+```jsx
 // app/page.js
 
 export default async function Page() {
-  const res = await fetch('<https://api.example.com/>...');
+  const res = await fetch('https://api.example.com/...');
   // 返り値は*シリアライズされません*
   // Date、Map、Setなどを使用できます。
-  const data = res.json();
+  const data = await res.json();
 
   return '...';
 }
-
 ```
 
 これは極めて重要で、"データの取得は開発者次第"という原則が実現されています。あなたはデータを取得し、任意のコンポーネントを組み合わせることができます。そしてそれは、自社のコンポーネントだけでなく、Server Componentsと統合されてサーバー上で完全に動作するように設計された[Twitterの埋め込み](https://github.com/vercel-labs/react-tweet)`react-tweet`のような、Server Componentsのエコシステム内の任意のコンポーネントも対象となります。
+<!-- 第6部ここまで -->
 
 ```jsx:app.page.js
 // app/page.js
@@ -271,7 +284,7 @@ export default async function Page() {
 
 ```
 
-ルーターが[React Suspense](https://react.dev/reference/react/Suspense)と統合されているため、コンテンツの一部がロード中である間にフォールバックコンテンツをより流動的に表示し、必要に応じて徐々にコンテンツを表示することができます。
+ルーターが[React Suspense](https://react.dev/reference/react/Suspense)と連携しているため、コンテンツの一部がロード中でもフォールバックコンテンツをよりスムーズに表示し、必要に応じて段階的にコンテンツを表示することができます。
 
 ```jsx:app/page.js
 // app/page.js
@@ -282,10 +295,10 @@ import { PostFeed, Weather } from './components';
 export default function Page() {
   return (
     <section>
-      <Suspense fallback={<p>Loading feed...</p>}>
+      <Suspense fallback={<p>フィードをロード中...</p>}>
         <PostFeed />
       </Suspense>
-      <Suspense fallback={<p>Loading weather...</p>}>
+      <Suspense fallback={<p>天気をロード中...</p>}>
         <Weather />
       </Suspense>
     </section>
@@ -294,13 +307,14 @@ export default function Page() {
 
 ```
 
-さらに、ルーターはページのナビゲーションを[トランジション](https://react.dev/reference/react/useTransition)としてマークし、ルートのトランジションを中断可能にします。
+さらに、ルーターはページナビゲーションを[トランジション](https://react.dev/reference/react/useTransition)としてマークし、ルートのトランジションを中断可能にします。
 
 ## 自動的なサーバーレンダリングとコード分割
 
-Next.jsを作成したとき、開発者がWebpack、Babel、およびその他のツールを手動で設定し、Reactアプリケーションを稼働させることはまだ一般的でした。サーバーレンダリングやコード分割などのさらなる最適化を追加することは、カスタムソリューションではしばしば実装されていませんでした。Next.jsおよび他のReactフレームワークは、これらのベストプラクティスを実装し、強制するための抽象化レイヤーを作成しました。
+Next.jsを作成した当初、開発者がWebpack、Babel、およびその他のツールを手動で設定し、Reactアプリケーションを稼働させることが一般的でした。サーバーレンダリングやコード分割などのさらなる最適化を追加することは、カスタムソリューションではしばしば取り入れられていませんでした。Next.jsや他のReactフレームワークは、これらのベストプラクティスを実装し、適用するための抽象化レイヤーを作りました。
 
-ルートベースのコード分割は、`pages/`ディレクトリ内の各ファイルがそれぞれのJavaScriptバンドルにコード分割されることを意味し、ファイルシステムを軽減し、初期ページロードのパフォーマンスを向上させるのに役立ちました。
+ルートベースのコード分割とは、`pages/`ディレクトリ内の各ファイルがそれぞれ独立したJavaScriptバンドルに分割されるということです。これによりファイルシステムが軽量化され、初回ページロードのパフォーマンスが向上しました。
+<!-- 第7部ここまで -->
 
 これは、Next.jsのサーバーレンダリングアプリケーションとシングルページアプリケーションの両方にとって有益でした。後者はしばしばアプリケーションの起動時に単一の大きなJavaScriptバンドルをロードします。ただし、コンポーネントレベルのコード分割を実装するためには、開発者は`next/dynamic`を使用してコンポーネントを動的にインポートする必要がありました。
 
