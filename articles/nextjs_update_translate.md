@@ -51,7 +51,7 @@ Next.jsは今や6年目です。当初の設計原則はそのまま残ってお
 
 [ファイルシステムベースのルーティング](https://nextjs.org/docs/app/building-your-application/routing)はNext.jsのコア機能でした。当初の投稿では、1つのReactコンポーネントからルートを作成するこの例を示しました:
 
-```
+```jsx:pages/about.js
 // ページルーター
 // pages/about.js
 
@@ -70,7 +70,7 @@ export default () => <h1>私たちについて</h1>;
 
 これは、私たちが[レイアウトのRFC](https://nextjs.org/blog/layouts-rfc)の最初のリリース後に着地した場所です。
 
-```
+```jsx:app/layout.js
 // 新: App Router ✨
 // app/layout.js
 export default function RootLayout({ children }) {
@@ -92,7 +92,7 @@ export default function Page() {
 
 この基盤により、我々は初めてReactのプリミティブを拡張するために開発されたNext.js特有のAPIを削除することができました。例えば、グローバル共有レイアウトをカスタマイズするためにカスタム`_app`ファイルを使用する必要はもうありません：
 
-```
+```jsx:pages/_app.js
 // ページルーター
 // pages/_app.js
 
@@ -106,7 +106,7 @@ export default function MyApp({ Component, pageProps }) {
 
 ページルーターでは、レイアウトを組み合わせることができず、データフェッチングをコンポーネントと同じ場所に配置することができませんでした。新しいApp Routerでは、これがサポートされています。
 
-```
+```jsx:app/layout.js
 // 新: App Router ✨
 // app/layout.js
 //
@@ -134,7 +134,7 @@ export default function DashboardLayout({ children }) {
 
 ページルーターでは、`_document`を使用してサーバーからの初期ペイロードをカスタマイズしていました。
 
-```
+```jsx:pages/_document.js
 // ページルーター
 // pages/_document.js
 
@@ -158,7 +158,7 @@ export default function Document() {
 
 App Routerでは、Next.jsから`<Html>`、`<Head>`、`<Body>`をインポートする必要はもうありません。代わりに、Reactを使用します。
 
-```
+```jsx:app/layout.js
 // 新: App Router ✨
 // app/layout.js
 //
@@ -183,7 +183,7 @@ export default function RootLayout({ children }) {
 
 Next.jsとReactの開発者は、JavaScriptとTypeScriptのコードを書き、アプリケーションのコンポーネントをまとめて使用したいと考えています。私たちの最初の投稿から引用します：
 
-```
+```jsx
 import React from 'react';
 import Head from 'next/head';
 
@@ -202,7 +202,7 @@ export default () => (
 
 たとえば、データをフェッチしたい場合、Next.jsの最初のバージョンは次のようになります：
 
-```
+```jsx
 import React from 'react';
 import 'isomorphic-fetch';
 
@@ -224,7 +224,7 @@ export default class extends React.Component {
 
 `getInitialProps`は今でも動作しますが、その後、顧客のフィードバックに基づいて次世代のデータフェッチングAPI、`getServerSideProps`と`getStaticProps`に向けて進化しました。
 
-```
+```jsx
 // ルートの静的バージョンを生成する
 export async function getStaticProps(context) {
   return { props: {} };
@@ -244,7 +244,7 @@ Next.jsが作成されて以来、私たちはMetaのReactコアチームと緊�
 
 App Routerでは、おなじみのasyncとawaitの構文を使用して[データをフェッチ](https://nextjs.org/docs/app/building-your-application/data-fetching)します。新たに学ぶべきAPIはありません。デフォルトでは、すべてのコンポーネントはReact Server Componentsであるため、データフェッチングはサーバー上で安全に行われます。例えば：
 
-```
+```jsx:app/page.js
 // app/page.js
 
 export default async function Page() {
@@ -260,7 +260,7 @@ export default async function Page() {
 
 これは極めて重要で、"データの取得は開発者次第"という原則が実現されています。あなたはデータを取得し、任意のコンポーネントを組み合わせることができます。そしてそれは、自社のコンポーネントだけでなく、Server Componentsと統合されてサーバー上で完全に動作するように設計された[Twitterの埋め込み](https://github.com/vercel-labs/react-tweet)`react-tweet`のような、Server Componentsのエコシステム内の任意のコンポーネントも対象となります。
 
-```
+```jsx:app.page.js
 // app/page.js
 
 import { Tweet } from 'react-tweet';
@@ -273,7 +273,7 @@ export default async function Page() {
 
 ルーターが[React Suspense](https://react.dev/reference/react/Suspense)と統合されているため、コンテンツの一部がロード中である間にフォールバックコンテンツをより流動的に表示し、必要に応じて徐々にコンテンツを表示することができます。
 
-```
+```jsx:app/page.js
 // app/page.js
 
 import { Suspense } from 'react';
@@ -304,7 +304,7 @@ Next.jsを作成したとき、開発者がWebpack、Babel、およびその他�
 
 これは、Next.jsのサーバーレンダリングアプリケーションとシングルページアプリケーションの両方にとって有益でした。後者はしばしばアプリケーションの起動時に単一の大きなJavaScriptバンドルをロードします。ただし、コンポーネントレベルのコード分割を実装するためには、開発者は`next/dynamic`を使用してコンポーネントを動的にインポートする必要がありました。
 
-```
+```jsx:app/page.tsx
 // app/page.tsx
 
 import dynamic from 'next/dynamic';
@@ -323,7 +323,7 @@ App Routerを使用すると、Server ComponentsはブラウザのJavaScriptバ�
 
 例えば、条件付きロジックで全体のコードパスをコード分割することができます。この例では、ログアウトしたユーザーのクライアントサイドJavaScriptをロードする必要はありません。
 
-```
+```jsx:app/layout.tsx
 // app/layout.tsx
 
 import { getUser } from './auth';
@@ -353,7 +353,7 @@ Reactエコシステムは、フォーム、フォームステートの管理、
 
 私たちは、Next.jsでの実験的なServer Actionsのサポートを発表することに興奮しています。これにより、APIレイヤーを介さずにサーバー上のデータを変更し、関数を直接呼び出すことが可能になります。
 
-```
+```jsx:app/post/[id]/page.tsx
 // app/post/[id]/page.tsx (Server Component)
 
 import kv from './kv';
@@ -375,7 +375,7 @@ export default function Page({ params }) {
 
 Server Actionsを使用すると、強力なサーバーファーストのデータ変更、クライアントサイドのJavaScriptの減少、そして段階的に強化されたフォームが利用できます。
 
-```
+```jsx:app/dashboard/posts/page.tsx
 // app/dashboard/posts/page.tsx (Server Component)
 
 import db from './db';
@@ -406,7 +406,7 @@ Next.jsのServer Actionsは、データライフサイクルの他の部分、Ne
 
 新しいAPIであるrevalidatePathとrevalidateTagを通じてデータを再検証することで、変更、ページの再レンダリング、リダイレクトが一回のネットワークラウンドトリップで行われ、アップストリームプロバイダが遅い場合でもクライアント上に正しいデータが表示されることが確保されます。
 
-```
+```jsx:app/dashboard/posts/page.tsx
 // app/dashboard/posts/page.tsx (Server Component)
 
 import db from './db';
@@ -432,7 +432,7 @@ Server Actionsは組み合わせ可能に設計されています。Reactコミ�
 
 [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions)は、Next.js 13.4で今日からアルファ版で利用可能です。Server Actionsを使用することを選択すると、Next.jsはReactの実験的リリースチャンネルを使用します。
 
-```
+```jsx
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
