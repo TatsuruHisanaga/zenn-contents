@@ -229,7 +229,7 @@ export default class extends React.Component {
 }
 ```
 
-~~Next.jsの将来のバージョンでは、isomorphic-fetchやnode-fetchをインポートする必要がなく、クライアントとサーバーの両方でWeb fetch APIを使用できるように、fetchをポリフィルするDX改善を追加しました。~~
+*~Next.jsの将来のバージョンでは、isomorphic-fetchやnode-fetchをインポートする必要がなく、クライアントとサーバーの両方でWeb fetch APIを使用できるように、fetchをポリフィルするDX改善を追加しました。~*
 
 フレームワークが成熟し、採用が拡大するにつれて、新しいデータフェッチングのパターンを探求しました。
 
@@ -316,6 +316,7 @@ Next.jsを作成した当初、開発者がWebpack、Babel、およびその他�
 ルートベースのコード分割とは、`pages/`ディレクトリ内の各ファイルがそれぞれ独立したJavaScriptバンドルに分割されるということです。これによりファイルシステムが軽量化され、初回ページロードのパフォーマンスが向上しました。
 <!-- 第7部ここまで -->
 
+
 これは、Next.jsのサーバーレンダリングアプリケーションとシングルページアプリケーションの両方にとって有益でした。後者はしばしばアプリケーションの起動時に単一の大きなJavaScriptバンドルをロードします。ただし、コンポーネントレベルのコード分割を実装するためには、開発者は`next/dynamic`を使用してコンポーネントを動的にインポートする必要がありました。
 
 ```jsx:app/page.tsx
@@ -324,7 +325,7 @@ Next.jsを作成した当初、開発者がWebpack、Babel、およびその他�
 import dynamic from 'next/dynamic';
 
 const DynamicHeader = dynamic(() => import('../components/header'), {
-  loading: () => <p>Loading...</p>,
+  loading: () => <p>ロード中...</p>,
 });
 
 export default function Home() {
@@ -333,7 +334,7 @@ export default function Home() {
 
 ```
 
-App Routerを使用すると、Server ComponentsはブラウザのJavaScriptバンドルに含まれません。[Client components](https://nextjs.org/docs/getting-started/react-essentials#client-components)はデフォルトで自動的にコード分割されます（Next.jsのwebpackまたはTurbopackを使用）。さらに、ルーターアーキテクチャ全体がストリーミングとSuspenseを有効にしているため、サーバーからクライアントへのUIの一部を逐次送信することができます。
+App Routerを使用すると、Server ComponentsはブラウザのJavaScriptバンドルに含まれません。[クライアントコンポーネント](https://nextjs.org/docs/getting-started/react-essentials#client-components)はデフォルトで自動的にコード分割されます（Next.jsのwebpackまたはTurbopackを使用）。さらに、ルーターアーキテクチャ全体がストリーミングとSuspenseを有効にしているため、サーバーからクライアントへのUIの一部を逐次送信することができます。
 
 例えば、条件付きロジックで全体のコードパスをコード分割することができます。この例では、ログアウトしたユーザーのクライアントサイドJavaScriptをロードする必要はありません。
 
@@ -345,23 +346,32 @@ import { Dashboard, Landing } from './components';
 
 export default async function Layout() {
   const isLoggedIn = await getUser();
-  return isLoggedIn ? <Dashboard /> : <
+  return isLoggedIn ? <Dashboard /> : <Landing />;
+}
+
 ```
+上記のコードでは、ログイン状態に基づいて表示するコンポーネントを選択しています。ログインしているユーザーには`Dashboard`コンポーネントを、ログインしていないユーザーには`Landing`コンポーネントを表示します。これにより、ログインしていないユーザーのブラウザには、`Dashboard`コンポーネントのJavaScriptコードは送信されません。
+<!-- 第8部ここまで -->
+：
 
 ## Turbopack（ベータ版）
 
-[Turbopack](https://turbo.build/pack)は、新たに試験的に導入し、Next.jsを通じて安定化を図っている私たちの新しいバンドラーです。Turbopackを使用すると、Next.jsアプリケーションの開発（`next dev --turbo`を使用）や、間もなく本番ビルド（`next build --turbo`を使用）のスピードが向上します。
+[Turbopack](https://turbo.build/pack)は、試験的に導入した私たちの新しいバンドラーで、Next.jsを通じてその安定性を追求しています。Turbopackを使用すると、Next.jsアプリケーションの開発速度（`next dev --turbo`を使用）や、間もなく本番ビルドの速度（`next build --turbo`を使用）が向上します。
 
-Next.js 13のアルファリリース以降、バグ修正や欠落している機能のサポート追加を行なってきた結果、採用率は着実に上昇しています。私たちは、[Vercel.com](http://vercel.com/)や多数のVercelの顧客が運用する大規模なNext.jsウェブサイトでTurbopackをドッグフーディングし、フィードバックを収集し、安定性を向上させてきました。私たちのチームへのバグ報告に協力していただいたコミュニティの皆さんに感謝いたします。
+Next.js 13のアルファリリース以降、バグの修正や欠落している機能へのサポートの追加を行ってきました。結果として、Turbopackの採用率は着実に上昇しています。私たちは、[Vercel.com](http://vercel.com/)や多数のVercelの顧客が運用する大規模なNext.jsウェブサイトでTurbopackをドッグフーディングし、フィードバックを収集し、安定性を向上させてきました。私たちのチームへのバグ報告に協力していただいたコミュニティの皆様に感謝申し上げます。
 
-今から6ヶ月後、私たちはベータフェーズに進む準備が整いました。
+現時点で、私たちはベータフェーズに進む準備が整いました。
 
-TurbopackはまだwebpackやNext.jsと完全な機能の互換性を持っていません。私たちは[この問題](https://github.com/vercel/next.js/issues/49174)でその機能のサポートを追跡しています。ただし、大半のユースケースは現在サポートされているはずです。このベータ版の目標は、採用率の増加から発生する残りのバグに対応し、将来のバージョンでの安定性を準備することです。
+TurbopackはまだwebpackやNext.jsと完全な機能の互換性を持っていません。私たちは[この問題](https://github.com/vercel/next.js/issues/49174)でその機能のサポートを追跡しています。しかし、大半のユースケースは既にサポートされています。このベータ版の目標は、採用率の増加に伴って発生する可能性のある残りのバグに対応し、将来のバージョンの安定性を確保することです。
 
-Turbopackのインクリメンタルエンジンとキャッシングレイヤーを改善するための投資は、ローカルの開発速度だけでなく、間もなく本番ビルドの速度も向上させます。インスタントビルドが可能な`next build --turbo`を実行できる将来のNext.jsバージョンをお楽しみに。今日からNext.js 13.4で`next dev --turbo`を使って[Turbopack](https://nextjs.org/docs/architecture/turbopack)ベータ版を試してみてください。
+Turbopackのインクリメンタルエンジンとキャッシングレイヤーを改善するための投資により、ローカルの開発速度だけでなく、近い将来に本番ビルドの速度も向上する予定です。インスタントビルドが可能な`next build --turbo`を実行できる将来のNext.jsバージョンをお楽しみに。本日よりNext.js 13.4で`next dev --turbo`を使用し[Turbopack](https://nextjs.org/docs/architecture/turbopack)のベータ版を試すことができます。
 
-Server Actions（アルファ版）
-Reactエコシステムは、フォーム、フォームステートの管理、データのキャッシングと再検証に関するアイデアの革新と探求を見てきました。時間の経過とともに、Reactはこれらのパターンについてより意見を持つようになりました。例えば、フォームステートには「[非制御コンポーネント](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components)」を推奨しています。
+## Server Actions（アルファ版）
+
+Reactエコシステムは、フォーム、フォームステートの管理、データのキャッシングと再検証に関するアイデアの革新と探求を経験してきました。時間が経つにつれて、Reactはこれらのパターンについてより強く意見を持つようになりました。例えば、フォームステートについては「[非制御コンポーネント](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components)」を推奨しています。
+
+
+<!-- 第9部ここまで ここから😱🤑⚡ -->
 
 現在のエコシステムの解決策は、再利用可能なクライアントサイドのソリューションか、フレームワークに組み込まれたプリミティブのどちらかでした。しかし、これまでサーバーの変更とデータプリミティブを組み合わせる方法はありませんでした。Reactチームは、[変更に対する初のソリューションを開発してきました。](https://react.dev/blog/2023/03/22/react-labs-what-we-have-been-working-on-march-2023)
 
@@ -415,6 +425,7 @@ export default function Page() {
 }
 
 ```
+<!-- 第10ぶっここまで -->
 
 Next.jsのServer Actionsは、データライフサイクルの他の部分、Next.js Cache、Incremental Static Regeneration（ISR）、およびクライアントルーターと深く統合するように設計されています。
 
@@ -457,6 +468,7 @@ const nextConfig = {
 module.exports = nextConfig;
 
 ```
+<!-- 第11部ここまで -->
 
 その他の改善点
 
@@ -474,6 +486,7 @@ App Routerは、Reactのcanaryチャンネル上に構築されており、Serve
 今日から、新しいアプリケーションの構築にはApp Routerを使用することを推奨します。App Routerを説明し、一から書き直されたNext.js betaドキュメンテーションは、現在、[安定したNext.jsドキュメンテーション](https://nextjs.org/docs)に戻されました。現在では、App RouterとPages Routerの間を簡単に切り替えることができます。
 
 [App Routerの段階的な導入ガイドを](https://nextjs.org/docs/app/building-your-application/upgrading/app-router-migration)読むことを推奨します。これにより、App Routerの導入方法を学ぶことができます。
+<!-- 第12部ここまで -->
 
 Pages Routerはなくなるのですか？
 いいえ。私たちは、pages/の開発をサポートし続けることを約束しています。これには、バグ修正、改善、セキュリティパッチが含まれ、今後も複数のメジャーバージョンで続けられます。開発者が準備ができたときに、App Routerを段階的に導入できるようにするためです。
@@ -484,6 +497,7 @@ pages/とapp/を一緒に本番環境で使用することは、サポートさ�
 Next.jsは、Server Componentsを含むReactアーキテクチャを採用するフレームワークの一つです。App Routerで提供される体験が、他のフレームワーク（あるいは新しいフレームワーク）にこのアーキテクチャを使用することを検討するきっかけとなることを願っています。
 
 無限スクロールのようなパターンはまだこのエコシステムで定義されていません。現在では、エコシステムが成長し、ライブラリが作成または更新される間、これらのパターンについてはクライアント側のソリューションを使用することを推奨しています。
+<!-- 第13部ここまで -->
 
 ## コミュニティ
 
