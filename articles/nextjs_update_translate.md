@@ -13,9 +13,9 @@ published_at: 2023-05-17 08:00 # 未来の日時を指定する
 :::message alert
 この記事は[Next.js 13.4 の公式リリース本文](https://nextjs.org/blog/next-13-4) をDeepLおよびChatGPT-4で翻訳・校正したのち、筆者が細かな日本語の修正を加え、体裁を整えたものです。公式リリースにある内容と齟齬がないよう、本文の翻訳には細心の注意を払っております。
 
- **しかしながら、筆者自身の学習の一環として、ChatGPT-4が生成した補足説明を、【補足説明】（黄色の背景部分）として、独自の判断で追記しています。** 
+ **ただし、筆者自身の学習の一環として、ChatGPT-4が生成した補足説明を【補足説明】（黄色の背景部分）として、独自の判断で追記しています。** 
 
-最善を尽くして内容の正確性を保つよう努めていますが、日本語と英語の間の微妙なニュアンスの違いにより、いくつかの誤解を招く可能性があります。また、補足説明や和訳そのものが必ずしも正確であることを断言できません。これらの点をご理解いただき、ご了承いただけますようお願い申し上げます。
+最善を尽くして内容の正確性を保つよう努めていますが、日本語と英語の間の微妙なニュアンスの違いにより、いくつかの誤解を招く可能性があります。また、補足説明や和訳そのものが必ずしも正確であることを断言できません。これらの点をご理解いただけますようお願い申し上げます。
 :::
 
 ---
@@ -62,8 +62,9 @@ Next.jsは現在6年目を迎えています。当初の設計原則はそのま
 
 [ファイルシステムベースのルーティング](https://nextjs.org/docs/app/building-your-application/routing)はNext.jsのコア機能でした。初期の投稿では、1つのReactコンポーネントからルートを作成するこの例を示しました：
 
-```jsx:従来型のページルーター：pages/about.js
+```jsx:従来型のページルーター
 
+//pages/about.js
 import React from 'react';
 export default () => <h1>私たちについて</h1>;
 
@@ -118,7 +119,9 @@ export default function Page() {
 
 この新しい基盤により、我々は初めてReactのプリミティブを拡張するために開発されたNext.js特有のAPIを削除できました。例えば、全体的な共有レイアウトをカスタマイズするためにカスタム`_app`ファイルを使用する必要はもうありません：
 
-```jsx:従来型のページルーター：pages/_app.js
+```jsx:従来型のページルーター
+
+// pages/_app.js
 // この"global layout"は全てのルートをラップします。
 // 他のレイアウトコンポーネントと組み合わせる方法はありませんし、
 // このファイルからグローバルなデータをフェッチすることはできません。
@@ -141,7 +144,7 @@ export default function MyApp({ Component, pageProps }) {
 ```jsx:新 App Router ✨
 // app/layout.js
 //
-// ルートレイアウトは。アプリケーション全体で共有されます
+// ルートレイアウトはアプリケーション全体で共有されます
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -165,7 +168,9 @@ export default function DashboardLayout({ children }) {
 　
 従来型のページルーターでは、`_document`を使用してサーバーからの初期ペイロードをカスタマイズしていました。
 
-```jsx:従来型のページルーター：pages/_document.js
+```jsx:従来型のページルーター
+
+// pages/_document.js
 // このファイルは、サーバーリクエストに対して<html>タグと<body>タグをカスタマイズすることを可能にします
 // ただし、HTML要素を直接記述するのではなく、フレームワーク特有の機能が追加されます。
 import { Html, Head, Main, NextScript } from 'next/document';
@@ -185,7 +190,8 @@ export default function Document() {
 
 しかし、App Routerでは、Next.jsから`<Html>`、`<Head>`、`<Body>`をインポートする必要はもうありません。代わりに、直接Reactを使用します。
 
-```jsx:新 App Router ✨：app/layout.js
+```jsx:新 App Router ✨
+// app/layout.js
 // ルートレイアウトはアプリケーション全体で共有されます
 export default function RootLayout({ children }) {
   return (
@@ -270,7 +276,7 @@ export async function getServerSideProps(context) {
 Next.jsが作成されて以来、私たちはMetaのReactコアチームと緊密に協力し、Reactの基本要素の上にフレームワークの機能を構築してきました。私たちのパートナーシップとReactコアチームによる長年の研究開発によって、Next.jsがReactアーキテクチャの最新バージョン、特に[サーバーコンポーネント](https://nextjs.org/docs/getting-started/react-essentials)を含む形で目標達成の機会を得ることができました。
 
 
-App Routerでは、おなじみの`async`と`await`の構文を使用して[データをフェッチ](https://nextjs.org/docs/app/building-your-application/data-fetching)します。新たに学ぶべきAPIはありません。デフォルトでは、すべてのコンポーネントはReact Server Componentsであるため、データフェッチングはサーバー上で安全に行われます。例えば、以下のような感じです。
+App Routerでは、おなじみの`async`と`await`の構文を使用して[データをフェッチ](https://nextjs.org/docs/app/building-your-application/data-fetching)するため、新たに学ぶべきAPIはありません。デフォルトでは、すべてのコンポーネントはReact Server Componentsであるため、データフェッチングはサーバー上で安全に行われます。例えば、以下のような感じです。
 
 ```jsx:app/page.js
 
@@ -350,7 +356,6 @@ App Routerを使用すると、Server ComponentsはブラウザのJavaScriptバ�
 例えば、条件分岐を利用することでコードパス全体を分割することができます。この例では、ログアウトしたユーザーに対して、ダッシュボードのクライアント側JavaScriptをロードする必要がなくなります。
 
 ```jsx:app/layout.tsx
-// app/layout.tsx
 
 import { getUser } from './auth';
 import { Dashboard, Landing } from './components';
