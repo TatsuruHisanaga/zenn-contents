@@ -2,13 +2,14 @@
 title: "Dockerの概要を簡単に理解する" # 記事のタイトル
 emoji: "🐋" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア記事
-topics: ["Docker"] # タグ。["markdown", "rust", "aws"]のように指定する
+topics: ["Docker", "メモ"] # タグ。["markdown", "rust", "aws"]のように指定する
 published: false # 公開設定（falseにすると下書き）
 ---
 
 ## はじめに
 
 ### この記事の目的
+筆者がDockerについて何度調べても忘れてしまうので、記事としてアウトプットすることにより記憶の定着を図ることを目的としています。
 
 ### 対象読者
 
