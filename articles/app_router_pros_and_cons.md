@@ -1,5 +1,5 @@
 ---
-title: "App Routerのメリット デメリットまとめ"
+title: "App Routerのメリット デメリット個人的まとめ"
 emoji: "📑"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Nextjs","メモ"]
